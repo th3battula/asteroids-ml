@@ -8,6 +8,7 @@
         "describe": false,
         "document": false,
         "expect": false,
+        "Image": false,
         "jest": false,
         "localStorage": false,
         "sessionStorage": false,
