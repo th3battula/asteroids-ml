@@ -1,0 +1,6 @@
+coverage/
+dist/
+node_modules/
+*.log*
+dev/*.key
+dev/config.json
