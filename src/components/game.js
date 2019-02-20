@@ -16,27 +16,30 @@ class Game {
         this.lives = 3;
         this.player = null;
         this.obstacles = [];
-        this.score = null;
+        this.score = 0;
+        this.scoreText = null;
     }
 
     clearScreen = () => {
         this.context.setTransform(1, 0, 0, 1, 0, 0);
+        this.context.fillStyle = 'black';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     start = () => {
         this.player = new PlayerComponent({
             height: '5',
+            scale: 0.1,
             speed: 5,
             width: '30',
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
         });
 
-        this.score = new TextComponent({
+        this.scoreText = new TextComponent({
             size: '30px',
             fontFamily: 'Consolas',
-            color: 'black',
+            color: 'white',
             x: 280,
             y: 40,
         });
@@ -57,13 +60,23 @@ class Game {
             this.obstacles[i].update();
         }
 
+        this.scoreText.update();
         this.player.update();
-        this.score.update();
     }
 
     getCanvas = () => this.canvas;
 
     getContext = () => this.context;
+
+    getDimensions = () => ({
+        height: this.canvas.height,
+        width: this.canvas.width,
+    });
+
+    setScore = (score) => {
+        this.score = score;
+        this.scoreText.setText(this.score);
+    }
 }
 
 const game = new Game();
