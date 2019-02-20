@@ -7,6 +7,7 @@ export default class TextComponent extends Component {
 
         this.fontFamily = fontFamily;
         this.text = text;
+        this.startUpdate();
     }
 
     setText = (text) => {
@@ -14,7 +15,6 @@ export default class TextComponent extends Component {
     }
 
     update = () => {
-        this.context.fillStyle = this.color;
         this.context.font = `${this.size} ${this.fontFamily}`;
         this.context.fillText(this.text, this.x, this.y);
     }

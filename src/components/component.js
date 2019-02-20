@@ -12,6 +12,16 @@ export default class Component {
         this.context.fillRect(this.x, this.y, this.width, this.height);
     }
 
+    startUpdate = () => {
+        this.interval = setInterval(this.update, 20);
+    };
+
+    destroy = () => {
+        if (this.interval) {
+            clearInterval(this.interval);
+        }
+    }
+
     isCollidingWith = (otherObj) => {
         const componentLeft = this.x;
         const componentRight = this.x + (this.width);
@@ -31,5 +41,7 @@ export default class Component {
             crash = false;
         }
         return crash;
-    }
+    };
+
+    update = () => {};
 }

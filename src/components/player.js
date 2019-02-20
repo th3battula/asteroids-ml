@@ -1,6 +1,20 @@
+import throttle from 'lodash.throttle';
 import Component from './component';
 import shipSvg from '../assets/ship.svg';
 import game from './game';
+import Bullet from './bullet';
+
+const keys = Object.freeze({
+    LEFT: 'ArrowLeft',
+    RIGHT: 'ArrowRight',
+    UP: 'ArrowUp',
+    DOWN: 'ArrowDown',
+    W: 'w',
+    A: 'a',
+    S: 's',
+    D: 'd',
+    SPACE: ' ',
+});
 
 export default class PlayerComponent extends Component {
     constructor(properties) {
@@ -8,8 +22,9 @@ export default class PlayerComponent extends Component {
             acceleration = 0.2,
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
-            scale = 1,
-            speed = 1,
+            scale = 0.1,
+            shootInterval = 1000,
+            speed = 5,
             ...rest
         } = properties;
         super(rest);
@@ -22,6 +37,8 @@ export default class PlayerComponent extends Component {
         this.scale = scale;
         this.shipImage = new Image();
         this.shipImage.src = shipSvg;
+        this.shootInterval = shootInterval;
+        this.throttledShoot = throttle(this.shoot, this.shootInterval, { leading: true });
         this.maxSpeed = speed;
         this.velocity = {
             x: 0,
@@ -40,7 +57,7 @@ export default class PlayerComponent extends Component {
 
     handleKeyDown = (e) => {
         this.inputState[e.key] = true;
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Space') {
+        if (Object.values(keys).includes(e.key)) {
             e.preventDefault();
         }
     };
@@ -58,24 +75,40 @@ export default class PlayerComponent extends Component {
             x: velocity.x * magnitudeRatio,
             y: velocity.y * magnitudeRatio,
         };
-    }
+    };
+
+    shoot = () => {
+        //TAB
+        console.log('Shoot!');
+        const bulletX = this.x + ((this.shipImage.width * this.scale / 2) + Math.sin(this.angle));
+        const bulletY = this.y + ((this.shipImage.height * this.scale / 2) - Math.cos(this.angle));
+        const bullet = new Bullet({
+            angle: this.angle,
+            scale: 0.1,
+            speed: 10,
+            x: bulletX,
+            y: bulletY,
+        });
+        bullet.startUpdate();
+    };
 
     update = () => {
-        if (this.inputState.ArrowLeft) {
+        const isUpPressed = this.inputState[keys.UP] || this.inputState[keys.W];
+        if (this.inputState[keys.LEFT] || this.inputState[keys.A]) {
             this.angle -= (this.angularSpeed * (Math.PI / 180));
         }
 
-        if (this.inputState.ArrowRight) {
+        if (this.inputState[keys.RIGHT] || this.inputState[keys.D]) {
             this.angle += (this.angularSpeed * (Math.PI / 180));
         }
 
-        const accelerationToAdd = this.inputState.ArrowUp ? this.acceleration : 0;
-        const xVelToAdd = this.inputState.ArrowUp ?
-            ((accelerationToAdd) * Math.sin(this.angle)) :
-            0;
-        const yVelToAdd = this.inputState.ArrowUp ?
-            ((accelerationToAdd) * -Math.cos(this.angle)) :
-            0;
+        if (this.inputState[keys.SPACE]) { // spacebar is pressed
+            this.throttledShoot();
+        }
+
+        const accelerationToAdd = isUpPressed ? this.acceleration : 0;
+        const xVelToAdd = isUpPressed ? (accelerationToAdd * Math.sin(this.angle)) : 0;
+        const yVelToAdd = isUpPressed ? (accelerationToAdd * -Math.cos(this.angle)) : 0;
 
         const newVelocity = {
             x: this.velocity.x + xVelToAdd,
@@ -83,7 +116,7 @@ export default class PlayerComponent extends Component {
         };
 
         this.velocity = this.clampVelocity(newVelocity);
-        if (!this.inputState.ArrowUp) {
+        if (!isUpPressed) {
             const coefficientOfFriction = (1 - this.coefficientOfFriction);
             this.velocity = {
                 x: this.velocity.x * coefficientOfFriction,

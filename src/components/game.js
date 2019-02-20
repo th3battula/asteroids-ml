@@ -4,6 +4,7 @@ import PlayerComponent from './player';
 class Game {
     constructor(height = 600, width = 800) {
         this.canvas = document.createElement('canvas');
+        this.canvas.setAttribute('style', 'background-color:black');
         this.canvas.height = height;
         this.canvas.width = width;
         this.context = this.canvas.getContext('2d');
@@ -28,21 +29,19 @@ class Game {
 
     start = () => {
         this.player = new PlayerComponent({
-            height: '5',
-            scale: 0.1,
-            speed: 5,
-            width: '30',
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
         });
+        this.player.startUpdate();
 
         this.scoreText = new TextComponent({
             size: '30px',
-            fontFamily: 'Consolas',
+            fontFamily: 'sans-serif',
             color: 'white',
             x: 280,
             y: 40,
         });
+        this.scoreText.startUpdate();
     }
 
     endGame = () => {
@@ -59,9 +58,6 @@ class Game {
             this.obstacles[i].x += -1;
             this.obstacles[i].update();
         }
-
-        this.scoreText.update();
-        this.player.update();
     }
 
     getCanvas = () => this.canvas;
