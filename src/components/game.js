@@ -23,18 +23,11 @@ class Game {
         this.scoreText = null;
     }
 
-    clearScreen = () => {
-        this.context.setTransform(1, 0, 0, 1, 0, 0);
-        this.context.fillStyle = 'black';
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-
     start = () => {
         this.player = new PlayerComponent({
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
         });
-        this.player.startUpdate();
 
         this.scoreText = new TextComponent({
             size: '30px',
@@ -43,18 +36,23 @@ class Game {
             x: 280,
             y: 40,
         });
-        this.scoreText.startUpdate();
     }
 
     endGame = () => {
         clearInterval(this.interval);
     }
 
-    step = n => (this.frameNo / n) % 1 === 0;
+    clearScreen = () => {
+        this.context.setTransform(1, 0, 0, 1, 0, 0);
+        this.context.fillStyle = 'black';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
     updateGameArea = () => {
         this.clearScreen();
-        this.frameNo += 1;
+
+        this.player.update();
+        this.scoreText.update();
 
         Object.values(this.renderableComponents).forEach(component => component.render());
     }
@@ -67,6 +65,8 @@ class Game {
         height: this.canvas.height,
         width: this.canvas.width,
     });
+
+    getPlayer = () => this.player;
 
     setScore = (score) => {
         this.score = score;

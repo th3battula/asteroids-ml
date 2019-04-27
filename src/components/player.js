@@ -32,6 +32,7 @@ export default class PlayerComponent extends Component {
         this.acceleration = acceleration;
         this.angularSpeed = angularSpeed;
         this.angle = 0;
+        this.bullets = [];
         this.coefficientOfFriction = coefficientOfFriction;
         this.inputState = {};
         this.scale = scale;

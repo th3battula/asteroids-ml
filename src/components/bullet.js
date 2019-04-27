@@ -53,5 +53,6 @@ export default class Bullet extends Component {
         } else if (this.y > height) {
             this.y = 0;
         }
+        this.drawBullet();
     }
 }
