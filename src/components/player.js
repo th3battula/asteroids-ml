@@ -23,7 +23,7 @@ export default class PlayerComponent extends Component {
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
             scale = 0.1,
-            shootInterval = 1000,
+            shootInterval = 100,
             speed = 5,
             ...rest
         } = properties;
@@ -140,5 +140,8 @@ export default class PlayerComponent extends Component {
             this.y = 0;
         }
         this.drawImage();
+
+        //TAB
+        // this.bullets.forEach(bullet => bullet.update());
     }
 }

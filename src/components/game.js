@@ -1,3 +1,4 @@
+import { stepInterval } from '../constants/game-constants';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
 
@@ -9,7 +10,7 @@ class Game {
         this.canvas.width = width;
         this.context = this.canvas.getContext('2d');
         this.frameNo = 0;
-        this.interval = setInterval(this.updateGameArea, 20);
+        this.interval = setInterval(this.updateGameArea, stepInterval);
 
         this.root = document.getElementById('asteroids-root');
         this.root.append(this.canvas);
@@ -54,9 +55,11 @@ class Game {
         this.clearScreen();
         this.frameNo += 1;
 
-        for (let i = 0; i < this.obstacles.length; i += 1) {
-            this.obstacles[i].x += -1;
-            this.obstacles[i].update();
+        if (this.obstacles && this.obstacles.length) {
+            this.obstacles.forEach(obstacle => {
+                obstacle.x -= 1;
+                obstacle.update();
+            });
         }
     }
 

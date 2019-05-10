@@ -1,8 +1,10 @@
+import { stepInterval } from '../constants/game-constants';
 import game from './game';
 
 export default class Component {
     constructor({ width, height, x, y, type }) {
         this.height = height;
+        this.startTime = Date.now();
         this.type = type;
         this.width = width;
         this.x = x;
@@ -13,7 +15,10 @@ export default class Component {
     }
 
     startUpdate = () => {
-        this.interval = setInterval(this.update, 20);
+        this.interval = setInterval(this.update, stepInterval);
+        //TAB
+        console.log('#TAB stepInterval', stepInterval);
+        console.log('#TAB this.interval', this.interval);
     };
 
     destroy = () => {
@@ -31,16 +36,13 @@ export default class Component {
         const otherRight = otherObj.x + (otherObj.width);
         const otherTop = otherObj.y;
         const otherBottom = otherObj.y + (otherObj.height);
-        let crash = true;
-        if (
+
+        return !(
             (componentBottom < otherTop) ||
             (componentTop > otherBottom) ||
             (componentRight < otherLeft) ||
             (componentLeft > otherRight)
-        ) {
-            crash = false;
-        }
-        return crash;
+        );
     };
 
     update = () => {};

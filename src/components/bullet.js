@@ -20,13 +20,13 @@ export default class Bullet extends Component {
         this.color = color;
         this.lifetime = lifetime;
         this.scale = scale;
-        this.startTime = Date.now();
         this.velocity = {
             x: speed * Math.sin(angle),
             y: speed * -Math.cos(angle),
         };
 
         this.size = size;
+        this.startUpdate();
     }
 
     drawBullet = () => {
@@ -36,23 +36,23 @@ export default class Bullet extends Component {
     }
 
     update = () => {
-        if (Date.now() < (this.startTime + this.lifetime)) {
-            this.x += this.velocity.x;
-            this.y += this.velocity.y;
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
 
-            const { height, width } = game.getDimensions();
-            if (this.x < 0) {
-                this.x = width;
-            } else if (this.x > width) {
-                this.x = 0;
-            }
-            if (this.y < 0) {
-                this.y = height;
-            } else if (this.y > height) {
-                this.y = 0;
-            }
-            this.drawBullet();
-        } else {
+        const { height, width } = game.getDimensions();
+        if (this.x < 0) {
+            this.x = width;
+        } else if (this.x > width) {
+            this.x = 0;
+        }
+        if (this.y < 0) {
+            this.y = height;
+        } else if (this.y > height) {
+            this.y = 0;
+        }
+        this.drawBullet();
+
+        if ((this.startTime + this.lifetime) > Date.now()) {
             this.destroy();
         }
     }
