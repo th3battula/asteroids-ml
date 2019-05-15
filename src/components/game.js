@@ -1,3 +1,4 @@
+import { stepInterval } from '../constants/game-constants';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
 
@@ -7,9 +8,10 @@ class Game {
         this.canvas.setAttribute('style', 'background-color:black');
         this.canvas.height = height;
         this.canvas.width = width;
+        this.renderableComponents = {};
         this.context = this.canvas.getContext('2d');
         this.frameNo = 0;
-        this.interval = setInterval(this.updateGameArea, 20);
+        this.interval = setInterval(this.updateGameArea, stepInterval);
 
         this.root = document.getElementById('asteroids-root');
         this.root.append(this.canvas);
@@ -54,10 +56,7 @@ class Game {
         this.clearScreen();
         this.frameNo += 1;
 
-        for (let i = 0; i < this.obstacles.length; i += 1) {
-            this.obstacles[i].x += -1;
-            this.obstacles[i].update();
-        }
+        Object.values(this.renderableComponents).forEach(component => component.render());
     }
 
     getCanvas = () => this.canvas;
@@ -72,6 +71,14 @@ class Game {
     setScore = (score) => {
         this.score = score;
         this.scoreText.setText(this.score);
+    }
+
+    registerComponent = (component) => {
+        this.renderableComponents[component.id] = component;
+    }
+
+    unregisterComponent = (component) => {
+        delete this.renderableComponents[component.id];
     }
 }
 

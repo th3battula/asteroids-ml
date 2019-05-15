@@ -1,23 +1,24 @@
+import uuid from 'uuid/v1';
+import { stepInterval } from '../constants/game-constants';
 import game from './game';
 
 export default class Component {
-    constructor({ width, height, x, y, type }) {
+    constructor({ width, height, x, y }) {
         this.height = height;
-        this.type = type;
+        this.id = uuid();
+        this.startTime = Date.now();
         this.width = width;
         this.x = x;
         this.y = y;
 
         this.context = game.getContext();
         this.context.fillRect(this.x, this.y, this.width, this.height);
+        game.registerComponent(this);
     }
-
-    startUpdate = () => {
-        this.interval = setInterval(this.update, 20);
-    };
 
     destroy = () => {
         if (this.interval) {
+            game.unregisterComponent(this);
             clearInterval(this.interval);
         }
     }
@@ -31,16 +32,19 @@ export default class Component {
         const otherRight = otherObj.x + (otherObj.width);
         const otherTop = otherObj.y;
         const otherBottom = otherObj.y + (otherObj.height);
-        let crash = true;
-        if (
+
+        return !(
             (componentBottom < otherTop) ||
             (componentTop > otherBottom) ||
             (componentRight < otherLeft) ||
             (componentLeft > otherRight)
-        ) {
-            crash = false;
-        }
-        return crash;
+        );
+    };
+
+    render = () => {};
+
+    startUpdate = () => {
+        this.interval = setInterval(this.update, stepInterval);
     };
 
     update = () => {};

@@ -23,7 +23,7 @@ export default class PlayerComponent extends Component {
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
             scale = 0.1,
-            shootInterval = 1000,
+            shootInterval = 100,
             speed = 5,
             ...rest
         } = properties;
@@ -39,6 +39,7 @@ export default class PlayerComponent extends Component {
         this.shipImage.src = shipSvg;
         this.shootInterval = shootInterval;
         this.throttledShoot = throttle(this.shoot, this.shootInterval, { leading: true });
+        this.type = 'player';
         this.maxSpeed = speed;
         this.velocity = {
             x: 0,
@@ -49,7 +50,7 @@ export default class PlayerComponent extends Component {
         document.addEventListener('keyup', this.handleKeyUp);
     }
 
-    drawImage = () => {
+    render = () => {
         this.context.setTransform(this.scale, 0, 0, this.scale, this.x, this.y); // sets scale and origin
         this.context.rotate(this.angle);
         this.context.drawImage(this.shipImage, -this.shipImage.width / 2, -this.shipImage.height / 2);
@@ -78,18 +79,18 @@ export default class PlayerComponent extends Component {
     };
 
     shoot = () => {
-        //TAB
-        console.log('Shoot!');
         const bulletX = this.x + ((this.shipImage.width * this.scale / 2) + Math.sin(this.angle));
         const bulletY = this.y + ((this.shipImage.height * this.scale / 2) - Math.cos(this.angle));
         const bullet = new Bullet({
             angle: this.angle,
             scale: 0.1,
             speed: 10,
+            type: 'bullet',
             x: bulletX,
             y: bulletY,
         });
-        bullet.startUpdate();
+
+        return bullet;
     };
 
     update = () => {
@@ -139,6 +140,5 @@ export default class PlayerComponent extends Component {
         } else if (this.y > height) {
             this.y = 0;
         }
-        this.drawImage();
     }
 }
