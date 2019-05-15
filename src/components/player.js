@@ -23,7 +23,7 @@ export default class PlayerComponent extends Component {
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
             scale = 0.1,
-            shootInterval = 100,
+            shootInterval = 1000,
             speed = 5,
             ...rest
         } = properties;
