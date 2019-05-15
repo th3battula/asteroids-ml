@@ -32,6 +32,7 @@
             "ignoreComments": true
         }],
         "no-else-return": ["error", { "allowElseIf": true }],
+        "no-plusplus": [0],
         "no-underscore-dangle": [0],
         "no-unused-vars": [1],
         "no-use-before-define": [0],

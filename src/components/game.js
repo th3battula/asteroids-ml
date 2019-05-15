@@ -1,6 +1,8 @@
 import { stepInterval } from '../constants/game-constants';
+import { generateRandomCoordWithinCanvas } from '../utils/random-utils';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
+import Asteroid from './asteroid';
 
 class Game {
     constructor(height = 600, width = 800) {
@@ -21,6 +23,7 @@ class Game {
         this.obstacles = [];
         this.score = 0;
         this.scoreText = null;
+        this.stage = 0;
     }
 
     start = () => {
@@ -36,6 +39,24 @@ class Game {
             x: 280,
             y: 40,
         });
+
+        this.startStage();
+    }
+
+    startStage = () => {
+        this.stage++;
+
+        // const numberOfLargeAsteroids = 2 + this.stage * 2;
+        const numberOfLargeAsteroids = 1;
+        for (let i = 0; i < numberOfLargeAsteroids; i++) {
+            const randCoord = generateRandomCoordWithinCanvas(this.canvas.height, this.canvas.width);
+            const asteroid = new Asteroid({
+                x: randCoord.x,
+                y: randCoord.y,
+            });
+
+            this.obstacles.push(asteroid);
+        }
     }
 
     endGame = () => {

@@ -23,7 +23,7 @@ export default class PlayerComponent extends Component {
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
             scale = 0.1,
-            shootInterval = 1000,
+            shootInterval = 300,
             speed = 5,
             ...rest
         } = properties;
@@ -90,6 +90,12 @@ export default class PlayerComponent extends Component {
             x: bulletX,
             y: bulletY,
         });
+
+        this.bullets.push(bullet);
+        if (this.bullets.length > 4) { // hardcoded limit due to rules of original game
+            const bulletToDestroy = this.bullets.shift();
+            bulletToDestroy.destroy();
+        }
 
         return bullet;
     };
