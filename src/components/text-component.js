@@ -1,4 +1,5 @@
 import Component from './component';
+import { ComponentTypes } from '../constants/game-constants';
 
 export default class TextComponent extends Component {
     constructor(properties) {
@@ -13,7 +14,7 @@ export default class TextComponent extends Component {
 
         this.fontFamily = fontFamily;
         this.text = text;
-        this.type = 'text';
+        this.type = ComponentTypes.TEXT;
         this.startUpdate();
     }
 

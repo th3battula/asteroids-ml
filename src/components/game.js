@@ -1,8 +1,8 @@
-import { stepInterval } from '../constants/game-constants';
+import { stepInterval, ComponentTypes } from '../constants/game-constants';
 import { generateRandomCoordWithinCanvas } from '../utils/random-utils';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
-import Asteroid from './asteroid';
+import Asteroid, { AsteroidSize } from './asteroid';
 
 class Game {
     constructor(height = 600, width = 800) {
@@ -46,13 +46,21 @@ class Game {
     startStage = () => {
         this.stage++;
 
-        // const numberOfLargeAsteroids = 2 + this.stage * 2;
-        const numberOfLargeAsteroids = 1;
-        for (let i = 0; i < numberOfLargeAsteroids; i++) {
-            const randCoord = generateRandomCoordWithinCanvas(this.canvas.height, this.canvas.width);
+        const numberOfLargeAsteroids = 2 + this.stage * 2;
+        this.spawnAsteroids(numberOfLargeAsteroids, AsteroidSize.BIG);
+    }
+
+    spawnAsteroids = (count, asteroidSize, position) => {
+        for (let i = 0; i < count; i++) {
+            let actualPosition = position;
+            if (!actualPosition) {
+                actualPosition = generateRandomCoordWithinCanvas(this.canvas.height, this.canvas.width);
+            }
+
             const asteroid = new Asteroid({
-                x: randCoord.x,
-                y: randCoord.y,
+                asteroidSize,
+                x: actualPosition.x,
+                y: actualPosition.y,
             });
 
             this.obstacles.push(asteroid);
@@ -89,17 +97,35 @@ class Game {
 
     getPlayer = () => this.player;
 
+    loseLife = () => {
+        this.lives--;
+    }
+
     setScore = (score) => {
         this.score = score;
         this.scoreText.setText(this.score);
     }
 
+    getComponentsOfType = type => Object.values(this.renderableComponents)
+        .filter(component => component.type === type);
+
     registerComponent = (component) => {
         this.renderableComponents[component.id] = component;
     }
 
-    unregisterComponent = (component) => {
-        delete this.renderableComponents[component.id];
+    unregisterComponent = (id) => {
+        const component = this.renderableComponents[id] || {};
+        if (component.type === ComponentTypes.ASTEROID) {
+            const indexToRemove = this.obstacles.findIndex(obstacle => obstacle.id === id);
+            if (indexToRemove >= 0) {
+                this.obstacles.splice(indexToRemove, 1);
+            }
+
+            if (!this.obstacles.length) {
+                this.startStage();
+            }
+        }
+        delete this.renderableComponents[id];
     }
 }
 
