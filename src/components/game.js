@@ -8,6 +8,7 @@ class Game {
         this.canvas.setAttribute('style', 'background-color:black');
         this.canvas.height = height;
         this.canvas.width = width;
+        this.renderableComponents = {};
         this.context = this.canvas.getContext('2d');
         this.frameNo = 0;
         this.interval = setInterval(this.updateGameArea, stepInterval);
@@ -55,12 +56,7 @@ class Game {
         this.clearScreen();
         this.frameNo += 1;
 
-        if (this.obstacles && this.obstacles.length) {
-            this.obstacles.forEach(obstacle => {
-                obstacle.x -= 1;
-                obstacle.update();
-            });
-        }
+        Object.values(this.renderableComponents).forEach(component => component.render());
     }
 
     getCanvas = () => this.canvas;
@@ -75,6 +71,14 @@ class Game {
     setScore = (score) => {
         this.score = score;
         this.scoreText.setText(this.score);
+    }
+
+    registerComponent = (component) => {
+        this.renderableComponents[component.id] = component;
+    }
+
+    unregisterComponent = (component) => {
+        delete this.renderableComponents[component.id];
     }
 }
 

@@ -7,15 +7,16 @@ export default class TextComponent extends Component {
 
         this.fontFamily = fontFamily;
         this.text = text;
+        this.type = 'text';
         this.startUpdate();
     }
 
-    setText = (text) => {
-        this.text = text;
-    }
-
-    update = () => {
+    render = () => {
         this.context.font = `${this.size} ${this.fontFamily}`;
         this.context.fillText(this.text, this.x, this.y);
+    };
+
+    setText = (text) => {
+        this.text = text;
     }
 }

@@ -20,6 +20,7 @@ export default class Bullet extends Component {
         this.color = color;
         this.lifetime = lifetime;
         this.scale = scale;
+        this.type = 'bullet';
         this.velocity = {
             x: speed * Math.sin(angle),
             y: speed * -Math.cos(angle),
@@ -27,9 +28,11 @@ export default class Bullet extends Component {
 
         this.size = size;
         this.startUpdate();
+
+        setTimeout(this.destroy, this.lifetime);
     }
 
-    drawBullet = () => {
+    render = () => {
         this.context.setTransform(this.scale, 0, 0, this.scale, this.x, this.y); // sets scale and origin
         this.context.rotate(this.angle);
         this.context.drawImage(this.bulletImage, -this.bulletImage.width / 2, -this.bulletImage.height / 2);
@@ -49,11 +52,6 @@ export default class Bullet extends Component {
             this.y = height;
         } else if (this.y > height) {
             this.y = 0;
-        }
-        this.drawBullet();
-
-        if ((this.startTime + this.lifetime) > Date.now()) {
-            this.destroy();
         }
     }
 }
