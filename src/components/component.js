@@ -17,6 +17,7 @@ export default class Component {
         this.id = uuid();
         this.image = new Image();
         this.image.src = imageSrc;
+        this.isDead = false;
         this.lifetime = lifetime;
         this.speed = speed;
         this.startTime = Date.now();
@@ -89,6 +90,8 @@ export default class Component {
         this.context.rotate(this.angle);
         this.context.drawImage(this.image, -this.image.width / 2.0, -this.image.height / 2.0);
     }
+
+    kill = () => { this.isDead = true; }
 
     startUpdate = () => {
         this.updateInterval = setInterval(this.update, stepInterval);

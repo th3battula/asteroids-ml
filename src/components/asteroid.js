@@ -40,24 +40,25 @@ export default class Asteroid extends Component {
     }
 
     onCollision = (otherObj) => {
-        if (otherObj.type === ComponentTypes.PLAYER) {
-            otherObj.takeDamage();
-        } else if (otherObj.type === ComponentTypes.BULLET) {
-            otherObj.destroy();
-            let size;
-            if (this.asteroidSize === AsteroidSize.BIG) {
-                size = AsteroidSize.MEDIUM;
-            } else if (this.asteroidSize === AsteroidSize.MEDIUM) {
-                size = AsteroidSize.SMALL;
-            }
+        if (!this.isDead) {
+            if (otherObj.type === ComponentTypes.PLAYER) {
+                otherObj.takeDamage();
+            } else if (otherObj.type === ComponentTypes.BULLET) {
+                let size;
+                if (this.asteroidSize === AsteroidSize.BIG) {
+                    size = AsteroidSize.MEDIUM;
+                } else if (this.asteroidSize === AsteroidSize.MEDIUM) {
+                    size = AsteroidSize.SMALL;
+                }
 
-            if (size) {
-                game.spawnAsteroids(2, size, {
-                    x: this.x,
-                    y: this.y,
-                });
+                game.addToDestroyQueue(this);
+                if (size) {
+                    game.spawnAsteroids(2, size, {
+                        x: this.x,
+                        y: this.y,
+                    });
+                }
             }
-            this.destroy();
         }
     }
 }

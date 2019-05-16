@@ -18,6 +18,7 @@ class Game {
         this.root = document.getElementById('asteroids-root');
         this.root.append(this.canvas);
 
+        this.componentsToDestroy = [];
         this.lives = 3;
         this.player = null;
         this.obstacles = [];
@@ -80,6 +81,8 @@ class Game {
     updateGameArea = () => {
         this.clearScreen();
 
+        this.componentsToDestroy.forEach(component => component.destroy());
+        this.componentsToDestroy = [];
         Object.values(this.renderableComponents).forEach(component => component.render());
     }
 
@@ -123,6 +126,11 @@ class Game {
             }
         }
         delete this.renderableComponents[id];
+    }
+
+    addToDestroyQueue = (component) => {
+        component.kill();
+        this.componentsToDestroy.push(component);
     }
 }
 
