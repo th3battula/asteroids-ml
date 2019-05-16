@@ -34,7 +34,6 @@
         "start": "./node_modules/.bin/webpack-dev-server --config ./webpack.config.dev.babel.js --history-api-fallback -d"
     },
     "dependencies": {
-        "lodash.throttle": "^4.1.1",
         "seedrandom": "^3.0.1",
         "uuid": "^3.3.2"
     }

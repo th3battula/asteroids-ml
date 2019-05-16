@@ -3,6 +3,7 @@ import { generateRandomCoordWithinCanvas } from '../utils/random-utils';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
 import Asteroid, { AsteroidSize } from './asteroid';
+import LivesCounter from './lives-counter';
 
 class Game {
     constructor(height = 600, width = 800) {
@@ -34,11 +35,17 @@ class Game {
         });
 
         this.scoreText = new TextComponent({
-            size: '30px',
-            fontFamily: 'sans-serif',
             color: 'white',
-            x: 280,
-            y: 40,
+            fontFamily: 'sans-serif',
+            fontSize: '64px',
+            text: 0,
+            x: this.canvas.width / 4.0,
+            y: 32,
+        });
+
+        this.livesCounter = new LivesCounter({
+            x: this.canvas.width / 4.0,
+            y: 32,
         });
 
         this.startStage();
@@ -95,14 +102,16 @@ class Game {
         width: this.canvas.width,
     });
 
+    getLives = () => this.lives;
+
     getPlayer = () => this.player;
 
     loseLife = () => {
         this.lives--;
     }
 
-    setScore = (score) => {
-        this.score = score;
+    addToScore = (score) => {
+        this.score += score;
         this.scoreText.setText(this.score);
     }
 
