@@ -23,7 +23,7 @@ class Game {
         this.componentsToDestroy = [];
         this.interval = setInterval(this.updateGameArea, stepInterval);
         this.isGameOver = false;
-        this.lives = 1;
+        this.lives = 3;
         this.obstacles = [];
         this.renderableComponents = {};
         this.score = 0;
@@ -136,6 +136,8 @@ class Game {
     addToScore = (score) => {
         this.score += score;
         this.scoreText.setText(this.score);
+
+        // TAB TODO: add logic to give a new life per 10,000 points
     }
 
     getComponentsOfType = type => Object.values(this.renderableComponents)
