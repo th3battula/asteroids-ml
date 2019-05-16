@@ -80,9 +80,6 @@ class Game {
     updateGameArea = () => {
         this.clearScreen();
 
-        this.player.update();
-        this.scoreText.update();
-
         Object.values(this.renderableComponents).forEach(component => component.render());
     }
 

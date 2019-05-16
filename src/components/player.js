@@ -28,7 +28,7 @@ export default class PlayerComponent extends Component {
             acceleration = 0.2,
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
-            shootInterval = 300,
+            shootInterval = 150,
             ...rest
         } = properties;
         super({ ...defaultProps, ...rest });
@@ -50,6 +50,8 @@ export default class PlayerComponent extends Component {
 
         document.addEventListener('keydown', this.handleKeyDown);
         document.addEventListener('keyup', this.handleKeyUp);
+
+        this.startUpdate(); // included because this class overrides the update method
     }
 
     handleKeyDown = (e) => {
@@ -75,7 +77,7 @@ export default class PlayerComponent extends Component {
     };
 
     onCollision = (otherObj) => {
-        game.loseLife();
+        this.takeDamage();
     };
 
     shoot = () => {
@@ -99,7 +101,9 @@ export default class PlayerComponent extends Component {
         return bullet;
     };
 
-    takeDamage = () => {};
+    takeDamage = () => {
+        game.loseLife();
+    };
 
     update = () => {
         const isUpPressed = this.inputState[keys.UP] || this.inputState[keys.W];
@@ -134,8 +138,6 @@ export default class PlayerComponent extends Component {
         }
         this.x += this.velocity.x;
         this.y += this.velocity.y;
-
-        game.setScore(`Velocity: [${this.velocity.x}, ${this.velocity.y}]`);
 
         const { height, width } = game.getDimensions();
         if (this.x < 0) {

@@ -20,4 +20,10 @@ export default class Bullet extends Component {
 
         this.startUpdate();
     }
+
+    onCollision = () => {
+        //TAB
+        console.log('#TAB onCollision', this.type);
+        this.destroy();
+    }
 }
