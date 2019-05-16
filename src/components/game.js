@@ -43,6 +43,15 @@ class Game {
             y: 32,
         });
 
+        this.gameOverText = new TextComponent({
+            color: 'transparent',
+            fontFamily: 'sans-serif',
+            fontSize: '64px',
+            text: 'Game Over',
+            x: this.canvas.width / 4.0,
+            y: this.canvas.height / 4.0,
+        });
+
         this.livesCounter = new LivesCounter({
             x: this.canvas.width / 4.0,
             y: 32,
@@ -108,6 +117,12 @@ class Game {
 
     loseLife = () => {
         this.lives--;
+
+        if (this.lives <= 0) {
+            this.player.bullets.forEach(bullet => bullet.destroy());
+            this.gameOverText.color = 'white';
+            this.unregisterComponent(this.player.id);
+        }
     }
 
     addToScore = (score) => {

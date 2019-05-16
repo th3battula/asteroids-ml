@@ -19,6 +19,7 @@ const keys = Object.freeze({
 const defaultProps = {
     collisionTypeMask: [ComponentTypes.ASTEROID],
     imageSrc: shipSvg,
+    injuryInvulnerabilityTime: 2500,
     speed: 5,
 };
 
@@ -76,8 +77,14 @@ export default class PlayerComponent extends Component {
         };
     };
 
-    onCollision = (otherObj) => {
-        this.takeDamage();
+    onCollision = () => {
+        if (this.canCollide) {
+            this.canCollide = false;
+            setTimeout(() => {
+                this.canCollide = true;
+            }, this.injuryInvulnerabilityTime);
+            game.loseLife();
+        }
     };
 
     shoot = () => {
@@ -99,10 +106,6 @@ export default class PlayerComponent extends Component {
 
         setTimeout(() => { this.canShoot = true; }, this.shootInterval);
         return bullet;
-    };
-
-    takeDamage = () => {
-        game.loseLife();
     };
 
     update = () => {

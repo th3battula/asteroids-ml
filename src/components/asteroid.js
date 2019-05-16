@@ -47,9 +47,7 @@ export default class Asteroid extends Component {
 
     onCollision = (otherObj) => {
         if (!this.isDead) {
-            if (otherObj.type === ComponentTypes.PLAYER) {
-                otherObj.takeDamage();
-            } else if (otherObj.type === ComponentTypes.BULLET) {
+            if (otherObj.type === ComponentTypes.BULLET) {
                 game.addToScore(AsteroidScores[this.asteroidSize]);
                 let size;
                 if (this.asteroidSize === AsteroidSize.BIG) {
