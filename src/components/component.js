@@ -1,5 +1,5 @@
 import uuid from 'uuid/v1';
-import { stepInterval } from '../constants/game-constants';
+import { stepInterval, ComponentTypes } from '../constants/game-constants';
 import game from './game';
 
 export default class Component {
@@ -7,16 +7,19 @@ export default class Component {
         angle = 0,
         collisionTypeMask = [],
         imageSrc = '',
+        injuryInvulnerabilityTime = 0,
         lifetime,
         speed = 1,
         x,
         y,
     }) {
         this.angle = angle;
+        this.canCollide = true;
         this.collisionTypeMask = collisionTypeMask;
         this.id = uuid();
         this.image = new Image();
         this.image.src = imageSrc;
+        this.injuryInvulnerabilityTime = injuryInvulnerabilityTime;
         this.isDead = false;
         this.lifetime = lifetime;
         this.speed = speed;
@@ -55,7 +58,7 @@ export default class Component {
         this.collisionTypeMask.forEach((type) => {
             const typeComponents = game.getComponentsOfType(type);
             typeComponents.forEach((component) => {
-                if (this.isCollidingWith(component)) {
+                if (component.canCollide && this.isCollidingWith(component)) {
                     this.onCollision(component);
                 }
             });

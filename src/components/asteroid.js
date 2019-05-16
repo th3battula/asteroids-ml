@@ -18,6 +18,12 @@ export const AsteroidSvg = Object.freeze({
     [AsteroidSize.SMALL]: asteroidSmallSvg,
 });
 
+export const AsteroidScores = Object.freeze({
+    [AsteroidSize.BIG]: 20,
+    [AsteroidSize.MEDIUM]: 50,
+    [AsteroidSize.SMALL]: 50,
+});
+
 const defaultProps = {
     collisionTypeMask: [ComponentTypes.PLAYER, ComponentTypes.BULLET],
 };
@@ -41,9 +47,8 @@ export default class Asteroid extends Component {
 
     onCollision = (otherObj) => {
         if (!this.isDead) {
-            if (otherObj.type === ComponentTypes.PLAYER) {
-                otherObj.takeDamage();
-            } else if (otherObj.type === ComponentTypes.BULLET) {
+            if (otherObj.type === ComponentTypes.BULLET) {
+                game.addToScore(AsteroidScores[this.asteroidSize]);
                 let size;
                 if (this.asteroidSize === AsteroidSize.BIG) {
                     size = AsteroidSize.MEDIUM;

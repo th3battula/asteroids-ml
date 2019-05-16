@@ -3,6 +3,7 @@ import { generateRandomCoordWithinCanvas } from '../utils/random-utils';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
 import Asteroid, { AsteroidSize } from './asteroid';
+import LivesCounter from './lives-counter';
 
 class Game {
     constructor(height = 600, width = 800) {
@@ -10,35 +11,50 @@ class Game {
         this.canvas.setAttribute('style', 'background-color:black');
         this.canvas.height = height;
         this.canvas.width = width;
-        this.renderableComponents = {};
         this.context = this.canvas.getContext('2d');
-        this.frameNo = 0;
-        this.interval = setInterval(this.updateGameArea, stepInterval);
 
         this.root = document.getElementById('asteroids-root');
         this.root.append(this.canvas);
 
-        this.componentsToDestroy = [];
-        this.lives = 3;
-        this.player = null;
-        this.obstacles = [];
-        this.score = 0;
-        this.scoreText = null;
-        this.stage = 0;
+        this.isGameOver = false;
     }
 
     start = () => {
+        this.componentsToDestroy = [];
+        this.interval = setInterval(this.updateGameArea, stepInterval);
+        this.isGameOver = false;
+        this.lives = 3;
+        this.obstacles = [];
+        this.renderableComponents = {};
+        this.score = 0;
+        this.stage = 0;
+
         this.player = new PlayerComponent({
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
         });
 
         this.scoreText = new TextComponent({
-            size: '30px',
-            fontFamily: 'sans-serif',
             color: 'white',
-            x: 280,
-            y: 40,
+            fontFamily: 'sans-serif',
+            fontSize: '64px',
+            text: 0,
+            x: this.canvas.width / 4.0,
+            y: 32,
+        });
+
+        this.gameOverText = new TextComponent({
+            color: 'transparent',
+            fontFamily: 'sans-serif',
+            fontSize: '64px',
+            text: 'Game Over',
+            x: this.canvas.width / 4.0,
+            y: this.canvas.height / 4.0,
+        });
+
+        this.livesCounter = new LivesCounter({
+            x: this.canvas.width / 4.0,
+            y: 32,
         });
 
         this.startStage();
@@ -55,7 +71,12 @@ class Game {
         for (let i = 0; i < count; i++) {
             let actualPosition = position;
             if (!actualPosition) {
-                actualPosition = generateRandomCoordWithinCanvas(this.canvas.height, this.canvas.width);
+                actualPosition = generateRandomCoordWithinCanvas(
+                    this.canvas.height,
+                    this.canvas.width,
+                    150,
+                    150,
+                );
             }
 
             const asteroid = new Asteroid({
@@ -69,7 +90,12 @@ class Game {
     }
 
     endGame = () => {
+        this.isGameOver = true;
+        this.player.bullets.forEach(bullet => bullet.destroy());
+        this.gameOverText.color = 'white';
+        this.unregisterComponent(this.player.id);
         clearInterval(this.interval);
+        this.updateGameArea();
     }
 
     clearScreen = () => {
@@ -95,15 +121,23 @@ class Game {
         width: this.canvas.width,
     });
 
+    getLives = () => this.lives;
+
     getPlayer = () => this.player;
 
     loseLife = () => {
         this.lives--;
+
+        if (this.lives <= 0) {
+            this.endGame();
+        }
     }
 
-    setScore = (score) => {
-        this.score = score;
+    addToScore = (score) => {
+        this.score += score;
         this.scoreText.setText(this.score);
+
+        // TAB TODO: add logic to give a new life per 10,000 points
     }
 
     getComponentsOfType = type => Object.values(this.renderableComponents)
