@@ -11,24 +11,24 @@ class Game {
         this.canvas.setAttribute('style', 'background-color:black');
         this.canvas.height = height;
         this.canvas.width = width;
-        this.renderableComponents = {};
         this.context = this.canvas.getContext('2d');
-        this.frameNo = 0;
-        this.interval = setInterval(this.updateGameArea, stepInterval);
 
         this.root = document.getElementById('asteroids-root');
         this.root.append(this.canvas);
 
-        this.componentsToDestroy = [];
-        this.lives = 3;
-        this.player = null;
-        this.obstacles = [];
-        this.score = 0;
-        this.scoreText = null;
-        this.stage = 0;
+        this.isGameOver = false;
     }
 
     start = () => {
+        this.componentsToDestroy = [];
+        this.interval = setInterval(this.updateGameArea, stepInterval);
+        this.isGameOver = false;
+        this.lives = 1;
+        this.obstacles = [];
+        this.renderableComponents = {};
+        this.score = 0;
+        this.stage = 0;
+
         this.player = new PlayerComponent({
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
@@ -71,7 +71,12 @@ class Game {
         for (let i = 0; i < count; i++) {
             let actualPosition = position;
             if (!actualPosition) {
-                actualPosition = generateRandomCoordWithinCanvas(this.canvas.height, this.canvas.width);
+                actualPosition = generateRandomCoordWithinCanvas(
+                    this.canvas.height,
+                    this.canvas.width,
+                    150,
+                    150,
+                );
             }
 
             const asteroid = new Asteroid({
@@ -85,7 +90,12 @@ class Game {
     }
 
     endGame = () => {
+        this.isGameOver = true;
+        this.player.bullets.forEach(bullet => bullet.destroy());
+        this.gameOverText.color = 'white';
+        this.unregisterComponent(this.player.id);
         clearInterval(this.interval);
+        this.updateGameArea();
     }
 
     clearScreen = () => {
@@ -119,9 +129,7 @@ class Game {
         this.lives--;
 
         if (this.lives <= 0) {
-            this.player.bullets.forEach(bullet => bullet.destroy());
-            this.gameOverText.color = 'white';
-            this.unregisterComponent(this.player.id);
+            this.endGame();
         }
     }
 
