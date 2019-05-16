@@ -1,18 +1,25 @@
 import Component from './component';
+import { ComponentTypes } from '../constants/game-constants';
 
 export default class TextComponent extends Component {
     constructor(properties) {
-        const { color, fontFamily, size, text, ...rest } = properties;
+        const {
+            color,
+            fontFamily,
+            fontSize,
+            text,
+            ...rest
+        } = properties;
         super(rest);
 
         this.fontFamily = fontFamily;
         this.text = text;
-        this.type = 'text';
+        this.type = ComponentTypes.TEXT;
         this.startUpdate();
     }
 
     render = () => {
-        this.context.font = `${this.size} ${this.fontFamily}`;
+        this.context.font = `${this.fontSize} ${this.fontFamily}`;
         this.context.fillText(this.text, this.x, this.y);
     };
 

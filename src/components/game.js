@@ -1,6 +1,8 @@
-import { stepInterval } from '../constants/game-constants';
+import { stepInterval, ComponentTypes } from '../constants/game-constants';
+import { generateRandomCoordWithinCanvas } from '../utils/random-utils';
 import TextComponent from './text-component';
 import PlayerComponent from './player';
+import Asteroid, { AsteroidSize } from './asteroid';
 
 class Game {
     constructor(height = 600, width = 800) {
@@ -16,17 +18,13 @@ class Game {
         this.root = document.getElementById('asteroids-root');
         this.root.append(this.canvas);
 
+        this.componentsToDestroy = [];
         this.lives = 3;
         this.player = null;
         this.obstacles = [];
         this.score = 0;
         this.scoreText = null;
-    }
-
-    clearScreen = () => {
-        this.context.setTransform(1, 0, 0, 1, 0, 0);
-        this.context.fillStyle = 'black';
-        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.stage = 0;
     }
 
     start = () => {
@@ -34,7 +32,6 @@ class Game {
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
         });
-        this.player.startUpdate();
 
         this.scoreText = new TextComponent({
             size: '30px',
@@ -43,19 +40,49 @@ class Game {
             x: 280,
             y: 40,
         });
-        this.scoreText.startUpdate();
+
+        this.startStage();
+    }
+
+    startStage = () => {
+        this.stage++;
+
+        const numberOfLargeAsteroids = 2 + this.stage * 2;
+        this.spawnAsteroids(numberOfLargeAsteroids, AsteroidSize.BIG);
+    }
+
+    spawnAsteroids = (count, asteroidSize, position) => {
+        for (let i = 0; i < count; i++) {
+            let actualPosition = position;
+            if (!actualPosition) {
+                actualPosition = generateRandomCoordWithinCanvas(this.canvas.height, this.canvas.width);
+            }
+
+            const asteroid = new Asteroid({
+                asteroidSize,
+                x: actualPosition.x,
+                y: actualPosition.y,
+            });
+
+            this.obstacles.push(asteroid);
+        }
     }
 
     endGame = () => {
         clearInterval(this.interval);
     }
 
-    step = n => (this.frameNo / n) % 1 === 0;
+    clearScreen = () => {
+        this.context.setTransform(1, 0, 0, 1, 0, 0);
+        this.context.fillStyle = 'black';
+        this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 
     updateGameArea = () => {
         this.clearScreen();
-        this.frameNo += 1;
 
+        this.componentsToDestroy.forEach(component => component.destroy());
+        this.componentsToDestroy = [];
         Object.values(this.renderableComponents).forEach(component => component.render());
     }
 
@@ -68,17 +95,42 @@ class Game {
         width: this.canvas.width,
     });
 
+    getPlayer = () => this.player;
+
+    loseLife = () => {
+        this.lives--;
+    }
+
     setScore = (score) => {
         this.score = score;
         this.scoreText.setText(this.score);
     }
 
+    getComponentsOfType = type => Object.values(this.renderableComponents)
+        .filter(component => component.type === type);
+
     registerComponent = (component) => {
         this.renderableComponents[component.id] = component;
     }
 
-    unregisterComponent = (component) => {
-        delete this.renderableComponents[component.id];
+    unregisterComponent = (id) => {
+        const component = this.renderableComponents[id] || {};
+        if (component.type === ComponentTypes.ASTEROID) {
+            const indexToRemove = this.obstacles.findIndex(obstacle => obstacle.id === id);
+            if (indexToRemove >= 0) {
+                this.obstacles.splice(indexToRemove, 1);
+            }
+
+            if (!this.obstacles.length) {
+                this.startStage();
+            }
+        }
+        delete this.renderableComponents[id];
+    }
+
+    addToDestroyQueue = (component) => {
+        component.kill();
+        this.componentsToDestroy.push(component);
     }
 }
 

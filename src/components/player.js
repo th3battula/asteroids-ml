@@ -1,8 +1,8 @@
-import throttle from 'lodash.throttle';
 import Component from './component';
 import shipSvg from '../assets/ship.svg';
 import game from './game';
 import Bullet from './bullet';
+import { ComponentTypes } from '../constants/game-constants';
 
 const keys = Object.freeze({
     LEFT: 'ArrowLeft',
@@ -16,31 +16,33 @@ const keys = Object.freeze({
     SPACE: ' ',
 });
 
+const defaultProps = {
+    collisionTypeMask: [ComponentTypes.ASTEROID],
+    imageSrc: shipSvg,
+    speed: 5,
+};
+
 export default class PlayerComponent extends Component {
     constructor(properties) {
         const {
             acceleration = 0.2,
             angularSpeed = 10,
             coefficientOfFriction = 0.01,
-            scale = 0.1,
-            shootInterval = 100,
-            speed = 5,
+            shootInterval = 150,
             ...rest
         } = properties;
-        super(rest);
+        super({ ...defaultProps, ...rest });
 
         this.acceleration = acceleration;
         this.angularSpeed = angularSpeed;
         this.angle = 0;
+        this.bullets = [];
+        this.canShoot = true;
         this.coefficientOfFriction = coefficientOfFriction;
         this.inputState = {};
-        this.scale = scale;
-        this.shipImage = new Image();
-        this.shipImage.src = shipSvg;
         this.shootInterval = shootInterval;
-        this.throttledShoot = throttle(this.shoot, this.shootInterval, { leading: true });
-        this.type = 'player';
-        this.maxSpeed = speed;
+        this.type = ComponentTypes.PLAYER;
+        this.maxSpeed = this.speed;
         this.velocity = {
             x: 0,
             y: 0,
@@ -48,12 +50,8 @@ export default class PlayerComponent extends Component {
 
         document.addEventListener('keydown', this.handleKeyDown);
         document.addEventListener('keyup', this.handleKeyUp);
-    }
 
-    render = () => {
-        this.context.setTransform(this.scale, 0, 0, this.scale, this.x, this.y); // sets scale and origin
-        this.context.rotate(this.angle);
-        this.context.drawImage(this.shipImage, -this.shipImage.width / 2, -this.shipImage.height / 2);
+        this.startUpdate(); // included because this class overrides the update method
     }
 
     handleKeyDown = (e) => {
@@ -78,19 +76,33 @@ export default class PlayerComponent extends Component {
         };
     };
 
+    onCollision = (otherObj) => {
+        this.takeDamage();
+    };
+
     shoot = () => {
-        const bulletX = this.x + ((this.shipImage.width * this.scale / 2) + Math.sin(this.angle));
-        const bulletY = this.y + ((this.shipImage.height * this.scale / 2) - Math.cos(this.angle));
+        this.canShoot = false;
+        const bulletX = this.x + ((this.width) * Math.sin(this.angle));
+        const bulletY = this.y - ((this.height) * Math.cos(this.angle));
         const bullet = new Bullet({
             angle: this.angle,
-            scale: 0.1,
-            speed: 10,
             type: 'bullet',
             x: bulletX,
             y: bulletY,
         });
 
+        this.bullets.push(bullet);
+        if (this.bullets.length > 4) { // hardcoded limit due to rules of original game
+            const bulletToDestroy = this.bullets.shift();
+            bulletToDestroy.destroy();
+        }
+
+        setTimeout(() => { this.canShoot = true; }, this.shootInterval);
         return bullet;
+    };
+
+    takeDamage = () => {
+        game.loseLife();
     };
 
     update = () => {
@@ -103,8 +115,8 @@ export default class PlayerComponent extends Component {
             this.angle += (this.angularSpeed * (Math.PI / 180));
         }
 
-        if (this.inputState[keys.SPACE]) { // spacebar is pressed
-            this.throttledShoot();
+        if (this.inputState[keys.SPACE] && this.canShoot) { // spacebar is pressed
+            this.shoot();
         }
 
         const accelerationToAdd = isUpPressed ? this.acceleration : 0;
@@ -126,8 +138,6 @@ export default class PlayerComponent extends Component {
         }
         this.x += this.velocity.x;
         this.y += this.velocity.y;
-
-        game.setScore(`Velocity: [${this.velocity.x}, ${this.velocity.y}]`);
 
         const { height, width } = game.getDimensions();
         if (this.x < 0) {
