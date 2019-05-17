@@ -5,5 +5,6 @@ export const ComponentTypes = Object.freeze({
     BULLET: 'bullet',
     LIVES_COUNTER: 'lives-counter',
     PLAYER: 'player',
+    SPACESHIP: 'spaceship',
     TEXT: 'text',
 });

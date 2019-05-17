@@ -4,6 +4,11 @@ import TextComponent from './text-component';
 import PlayerComponent from './player';
 import Asteroid, { AsteroidSize } from './asteroid';
 import LivesCounter from './lives-counter';
+import Spaceship, { SpaceshipSize } from './spaceship';
+
+function calculateNumberOfAsteroidsToSpawn(stageIndex) {
+    return 2 + stageIndex * 2;
+}
 
 class Game {
     constructor(height = 600, width = 800) {
@@ -26,6 +31,10 @@ class Game {
         this.lives = 3;
         this.obstacles = [];
         this.renderableComponents = {};
+        this.saucerCounts = {
+            [SpaceshipSize.BIG]: 0,
+            [SpaceshipSize.SMALL]: 0,
+        };
         this.score = 0;
         this.stage = 0;
 
@@ -63,7 +72,7 @@ class Game {
     startStage = () => {
         this.stage++;
 
-        const numberOfLargeAsteroids = 2 + this.stage * 2;
+        const numberOfLargeAsteroids = calculateNumberOfAsteroidsToSpawn(this.stage);
         this.spawnAsteroids(numberOfLargeAsteroids, AsteroidSize.BIG);
     }
 
@@ -87,6 +96,10 @@ class Game {
 
             this.obstacles.push(asteroid);
         }
+    }
+
+    spawnSaucer = () => {
+        console.log('spawn saucer');
     }
 
     endGame = () => {
@@ -153,6 +166,11 @@ class Game {
             const indexToRemove = this.obstacles.findIndex(obstacle => obstacle.id === id);
             if (indexToRemove >= 0) {
                 this.obstacles.splice(indexToRemove, 1);
+            }
+
+            const startingAsteroidsCount = calculateNumberOfAsteroidsToSpawn(this.stage);
+            if (this.obstacles.length < (startingAsteroidsCount * 0.8)) {
+                this.spawnSaucer();
             }
 
             if (!this.obstacles.length) {

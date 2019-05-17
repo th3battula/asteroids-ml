@@ -1,5 +1,5 @@
 import uuid from 'uuid/v1';
-import { stepInterval, ComponentTypes } from '../constants/game-constants';
+import { stepInterval } from '../constants/game-constants';
 import game from './game';
 
 export default class Component {
