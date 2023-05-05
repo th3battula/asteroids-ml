@@ -1,17 +1,38 @@
 import { v4 as uuid } from 'uuid';
-import { stepInterval, ComponentTypes } from '../constants/game-constants';
+import { ComponentTypes, stepInterval } from '../constants/game-constants';
 import game from './game';
 
 export default class Component {
+    angle: number;
+    canCollide: boolean;
+    collisionInterval = 0;
+    collisionTypeMask: string[];
+    context: CanvasRenderingContext2D;
+    height: number;
+    id: string;
+    image: InstanceType<typeof Image>;
+    injuryInvulnerabilityTime: number;
+    isDead: boolean;
+    lifetime?: number = 0;
+    speed: number;
+    startTime: number;
+    type: ComponentTypes;
+    updateInterval = 0;
+    velocity: { x: number, y: number };
+    width: number;
+    x = 0;
+    y = 0;
+
     constructor({
         angle = 0,
-        collisionTypeMask = [],
+        collisionTypeMask,
         imageSrc = '',
         injuryInvulnerabilityTime = 0,
-        lifetime,
+        lifetime = 0,
         speed = 1,
-        x,
-        y,
+        type,
+        x = 0,
+        y = 0,
     }) {
         this.angle = angle;
         this.canCollide = true;
@@ -24,6 +45,7 @@ export default class Component {
         this.lifetime = lifetime;
         this.speed = speed;
         this.startTime = Date.now();
+        this.type = type;
         this.height = this.image.height;
         this.width = this.image.width;
         this.velocity = {
@@ -86,7 +108,7 @@ export default class Component {
         return isColliding;
     };
 
-    onCollision = () => {}
+    onCollision = (component: Component) => {}
 
     render = () => {
         this.context.setTransform(1, 0, 0, 1, this.x, this.y); // sets scale and origin

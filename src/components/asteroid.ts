@@ -6,11 +6,11 @@ import asteroidSmallSvg from '../assets/asteroid-small.svg';
 import { ComponentTypes } from '../constants/game-constants';
 import game from './game';
 
-export const AsteroidSize = Object.freeze({
-    BIG: 1,
-    MEDIUM: 2,
-    SMALL: 4,
-});
+export enum AsteroidSize {
+    BIG = 1,
+    MEDIUM = 2,
+    SMALL = 4,
+}
 
 export const AsteroidSvg = Object.freeze({
     [AsteroidSize.BIG]: asteroidBigSvg,
@@ -26,17 +26,18 @@ export const AsteroidScores = Object.freeze({
 
 const defaultProps = {
     collisionTypeMask: [ComponentTypes.PLAYER, ComponentTypes.BULLET],
+    type: ComponentTypes.ASTEROID,
 };
 
 export default class Asteroid extends Component {
-    constructor(properties) {
-        const { asteroidSize = AsteroidSize.BIG, ...rest } = properties;
+    asteroidSize: AsteroidSize;
+
+    constructor({ asteroidSize = AsteroidSize.BIG, ...rest }) {
         super({ ...defaultProps, imageSrc: AsteroidSvg[asteroidSize], ...rest });
 
         this.angle = range(0, 360);
         this.asteroidSize = asteroidSize;
         this.speed = asteroidSize / 2;
-        this.type = ComponentTypes.ASTEROID;
         this.velocity = {
             x: this.speed * Math.sin(this.angle),
             y: this.speed * -Math.cos(this.angle),

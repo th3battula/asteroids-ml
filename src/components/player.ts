@@ -21,17 +21,26 @@ const defaultProps = {
     imageSrc: shipSvg,
     injuryInvulnerabilityTime: 2500,
     speed: 5,
+    type: ComponentTypes.PLAYER,
 };
 
 export default class PlayerComponent extends Component {
-    constructor(properties) {
-        const {
-            acceleration = 0.2,
-            angularSpeed = 10,
-            coefficientOfFriction = 0.01,
-            shootInterval = 150,
-            ...rest
-        } = properties;
+    acceleration: number;
+    angularSpeed: number;
+    bullets: Bullet[];
+    canShoot: boolean;
+    coefficientOfFriction: number;
+    inputState: { [key: string]: boolean };
+    shootInterval: number;
+    maxSpeed: number;
+
+    constructor({
+        acceleration = 0.2,
+        angularSpeed = 10,
+        coefficientOfFriction = 0.01,
+        shootInterval = 150,
+        ...rest
+    }) {
         super({ ...defaultProps, ...rest });
 
         this.acceleration = acceleration;
@@ -42,7 +51,6 @@ export default class PlayerComponent extends Component {
         this.coefficientOfFriction = coefficientOfFriction;
         this.inputState = {};
         this.shootInterval = shootInterval;
-        this.type = ComponentTypes.PLAYER;
         this.maxSpeed = this.speed;
         this.velocity = {
             x: 0,
@@ -101,7 +109,7 @@ export default class PlayerComponent extends Component {
         this.bullets.push(bullet);
         if (this.bullets.length > 4) { // hardcoded limit due to rules of original game
             const bulletToDestroy = this.bullets.shift();
-            bulletToDestroy.destroy();
+            bulletToDestroy!.destroy();
         }
 
         setTimeout(() => { this.canShoot = true; }, this.shootInterval);

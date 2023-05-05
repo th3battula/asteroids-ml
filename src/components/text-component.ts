@@ -1,7 +1,18 @@
 import Component from './component';
 import { ComponentTypes } from '../constants/game-constants';
 
+const defaultProps = {
+    collisionTypeMask: [],
+    type: ComponentTypes.TEXT,
+};
+
 export default class TextComponent extends Component {
+    color: string;
+    fontFamily: string;
+    fontSize: string;
+    text: string;
+    textAlign: CanvasTextAlign;
+
     constructor(properties) {
         const {
             color,
@@ -11,7 +22,7 @@ export default class TextComponent extends Component {
             textAlign = 'center',
             ...rest
         } = properties;
-        super(rest);
+        super({ ...defaultProps, ...rest });
 
         this.color = color;
         this.fontFamily = fontFamily;
