@@ -1,4 +1,4 @@
-import uuid from 'uuid/v1';
+import { v4 as uuid } from 'uuid';
 import { stepInterval, ComponentTypes } from '../constants/game-constants';
 import game from './game';
 

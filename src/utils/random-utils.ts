@@ -1,7 +1,7 @@
 import seedRandom from 'seedrandom';
 
 // eslint-disable-next-line prefer-destructuring
-const random = Math.random; // seedRandom('i am the seed'); // keeps the game deterministic
+const random = seedRandom('i am the seed'); // keeps the game deterministic
 
 export function range(min, max) {
     return random() * (max ? (max - min) : min) + (max ? min : 0);

@@ -2,7 +2,7 @@
     "env": {
         "jest": true
     },
-    "extends": "airbnb-base",
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
     "globals": {
         "alert": false,
         "describe": false,
@@ -18,25 +18,30 @@
     "overrides": [{
         "files": ["src/**/*.js"]
     }],
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "root": true,
     "rules": {
-        "import/no-extraneous-dependencies": [0],
-        "import/no-named-as-default": [0],
-        "import/no-named-as-default-member": [0],
-        "import/prefer-default-export": [0],
-        "indent": ["error", 4, { "SwitchCase": 1 }],
-        "linebreak-style": ["off"],
-        "max-len": [1, {
-            "code": 120,
-            "ignoreUrls": true,
-            "ignoreComments": true
-        }],
-        "no-else-return": ["error", { "allowElseIf": true }],
-        "no-plusplus": [0],
-        "no-underscore-dangle": [0],
-        "no-unused-vars": [1],
-        "no-use-before-define": [0],
-        "object-curly-newline": "off",
-        "operator-linebreak": "off"
+        "@typescript-eslint/no-empty-function": 0
     }
+    // "rules": {
+    //     "import/no-extraneous-dependencies": [0],
+    //     "import/no-named-as-default": [0],
+    //     "import/no-named-as-default-member": [0],
+    //     "import/prefer-default-export": [0],
+    //     "indent": ["error", 4, { "SwitchCase": 1 }],
+    //     "linebreak-style": ["off"],
+    //     "max-len": [1, {
+    //         "code": 120,
+    //         "ignoreUrls": true,
+    //         "ignoreComments": true
+    //     }],
+    //     "no-else-return": ["error", { "allowElseIf": true }],
+    //     "no-plusplus": [0],
+    //     "no-underscore-dangle": [0],
+    //     "no-unused-vars": [1],
+    //     "no-use-before-define": [0],
+    //     "object-curly-newline": "off",
+    //     "operator-linebreak": "off"
+    // }
 }
