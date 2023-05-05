@@ -4,17 +4,45 @@ import TextComponent from './text-component';
 import PlayerComponent from './player';
 import Asteroid, { AsteroidSize } from './asteroid';
 import LivesCounter from './lives-counter';
+import Spaceship, { SpaceshipSize } from './spaceship';
+import Component from './component';
+
+function calculateNumberOfAsteroidsToSpawn(stageIndex) {
+    return 2 + stageIndex * 2;
+}
 
 class Game {
+    canvas: HTMLCanvasElement;
+    componentsToDestroy: Component[] = [];
+    context: CanvasRenderingContext2D;
+    gameOverText: TextComponent | undefined;
+    interval = 0;
+    isGameOver: boolean;
+    lives = 0;
+    livesCounter: LivesCounter | undefined;
+    obstacles: Component[] = [];
+    player: PlayerComponent | undefined;
+    renderableComponents: { [key: string]: Component} = {};
+    root: HTMLElement;
+    saucerCounts: { [key in SpaceshipSize]?: number; };
+    score = 0;
+    scoreText: TextComponent | undefined;
+    stage = 0;
+
     constructor(height = 600, width = 800) {
         this.canvas = document.createElement('canvas');
         this.canvas.setAttribute('style', 'background-color:black');
         this.canvas.height = height;
         this.canvas.width = width;
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext('2d')!;
 
-        this.root = document.getElementById('asteroids-root');
+        this.root = document.getElementById('asteroids-root')!;
         this.root.append(this.canvas);
+
+        this.saucerCounts = {
+            [SpaceshipSize.BIG]: 0,
+            [SpaceshipSize.SMALL]: 0,
+        };
 
         this.isGameOver = false;
     }
@@ -26,6 +54,10 @@ class Game {
         this.lives = 3;
         this.obstacles = [];
         this.renderableComponents = {};
+        this.saucerCounts = {
+            [SpaceshipSize.BIG]: 0,
+            [SpaceshipSize.SMALL]: 0,
+        };
         this.score = 0;
         this.stage = 0;
 
@@ -63,11 +95,11 @@ class Game {
     startStage = () => {
         this.stage++;
 
-        const numberOfLargeAsteroids = 2 + this.stage * 2;
+        const numberOfLargeAsteroids = calculateNumberOfAsteroidsToSpawn(this.stage);
         this.spawnAsteroids(numberOfLargeAsteroids, AsteroidSize.BIG);
     }
 
-    spawnAsteroids = (count, asteroidSize, position) => {
+    spawnAsteroids = (count: number, asteroidSize: AsteroidSize, position?) => {
         for (let i = 0; i < count; i++) {
             let actualPosition = position;
             if (!actualPosition) {
@@ -89,11 +121,15 @@ class Game {
         }
     }
 
+    spawnSaucer = () => {
+        console.log('spawn saucer');
+    }
+
     endGame = () => {
         this.isGameOver = true;
-        this.player.bullets.forEach(bullet => bullet.destroy());
-        this.gameOverText.color = 'white';
-        this.unregisterComponent(this.player.id);
+        this.player!.bullets.forEach(bullet => bullet.destroy());
+        this.gameOverText!.color = 'white';
+        this.unregisterComponent(this.player!.id);
         clearInterval(this.interval);
         this.updateGameArea();
     }
@@ -107,9 +143,9 @@ class Game {
     updateGameArea = () => {
         this.clearScreen();
 
-        this.componentsToDestroy.forEach(component => component.destroy());
+        this.componentsToDestroy.forEach((component) => component.destroy());
         this.componentsToDestroy = [];
-        Object.values(this.renderableComponents).forEach(component => component.render());
+        Object.values(this.renderableComponents).forEach((component) => component.render());
     }
 
     getCanvas = () => this.canvas;
@@ -135,15 +171,15 @@ class Game {
 
     addToScore = (score) => {
         this.score += score;
-        this.scoreText.setText(this.score);
+        this.scoreText!.setText(this.score);
 
         // TAB TODO: add logic to give a new life per 10,000 points
     }
 
-    getComponentsOfType = type => Object.values(this.renderableComponents)
-        .filter(component => component.type === type);
+    getComponentsOfType = (type) => Object.values(this.renderableComponents)
+        .filter((component: Component) => component.type === type);
 
-    registerComponent = (component) => {
+    registerComponent = (component: Component) => {
         this.renderableComponents[component.id] = component;
     }
 
@@ -153,6 +189,11 @@ class Game {
             const indexToRemove = this.obstacles.findIndex(obstacle => obstacle.id === id);
             if (indexToRemove >= 0) {
                 this.obstacles.splice(indexToRemove, 1);
+            }
+
+            const startingAsteroidsCount = calculateNumberOfAsteroidsToSpawn(this.stage);
+            if (this.obstacles.length < (startingAsteroidsCount * 0.8)) {
+                this.spawnSaucer();
             }
 
             if (!this.obstacles.length) {

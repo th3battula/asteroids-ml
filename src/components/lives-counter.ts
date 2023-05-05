@@ -4,14 +4,18 @@ import shipSvg from '../assets/ship.svg';
 import game from './game';
 
 const defaultProps = {
+    collisionTypeMask: [],
     imageSrc: shipSvg,
+    type: ComponentTypes.LIVES_COUNTER,
 };
 
 export default class LivesCounter extends Component {
+    text: string | number;
+
     constructor(properties) {
         super({ ...defaultProps, ...properties });
 
-        this.type = ComponentTypes.LIVES_COUNTER;
+        this.text = '';
         this.startUpdate();
     }
 
